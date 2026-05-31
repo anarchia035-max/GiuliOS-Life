@@ -1,0 +1,7 @@
+services:
+  - type: static
+    name: lifeos
+    env: static
+    branch: main
+    staticPublishPath: /
+    plan: free

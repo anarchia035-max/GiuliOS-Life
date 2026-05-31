@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="it" class="h-full bg-[#09090b] text-[#f4f4f5]">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>LifeOS - Premium Edition</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LifeOS Gold">
+    <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=180&h=180&fit=crop&q=80">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#09090b">
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .luxury-title {
+            font-family: 'Cormorant Garamond', serif;
+        }
+        /* Disattivazione barre di scorrimento visive per preservare il minimalismo dell'interfaccia */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col justify-between pb-24 md:pb-6 select-none bg-[#09090b] text-[#e4e4e7] antialiased">
+
+    <header class="w-full max-w-md mx-auto pt-8 px-4 bg-[#09090b] sticky top-0 z-50 backdrop-blur-md bg-opacity-90">
+        <div class="flex justify-between items-center mb-5">
+            <div>
+                <h1 class="text-3xl font-medium tracking-wide luxury-title bg-gradient-to-r from-[#f3e7c4] via-[#d4af37] to-[#a67c1e] bg-clip-text text-transparent">LifeOS</h1>
+                <p class="text-[10px] text-[#a1a1aa] font-light tracking-[0.2em] uppercase mt-0.5" id="current-date-string">Domenica, 31 Maggio</p>
+            </div>
+            <button onclick="toggleSettings()" class="p-2.5 rounded-full bg-[#121214] border border-[#27272a] text-[#d4af37] hover:text-[#f3e7c4] transition-all active:scale-95">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.43l-1.003.767a1.123 1.123 0 00-.417 1.03c.004.074.006.148.006.222 0 .074-.002.148-.006.222a1.123 1.123 0 00.417 1.03l1.003.767a1.125 1.125 0 01.26 1.43l-1.296 2.247a1.125 1.125 0 01-1.37.49l-1.216-.456a1.125 1.125 0 00-1.075.124c-.073.044-.146.087-.22.128-.332.183-.582.495-.645.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281a1.125 1.125 0 00-.646-.87c-.074-.041-.148-.084-.22-.128a1.125 1.125 0 00-1.075-.124l-1.217.456a1.125 1.125 0 01-1.37-.49l-1.296-2.247a1.125 1.125 0 01-.26-1.43l1.003-.767a1.122 1.122 0 00.417-1.03c-.004-.074-.006-.148-.006-.222 0-.074.002-.148.006-.222a1.122 1.122 0 00-.417-1.03l-1.003-.767a1.125 1.125 0 01-.26-1.43l1.296-2.247a1.125 1.125 0 011.37-.49l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.646-.869L9.593 3.94z" />
+                    <circle cx="12" cy="12" r="3" />
+                </svg>
+            </button>
+        </div>
+
+        <div id="settings-panel" class="hidden mb-6 p-5 rounded-2xl bg-[#0e0e11] border border-[#27272a] transition-all">
+            <h3 class="text-xs font-semibold tracking-wider text-[#d4af37] uppercase mb-4 flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#d4af37]"></span> Chiavi di Accesso
+            </h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-[10px] uppercase tracking-widest text-[#a1a1aa] mb-1.5">OpenWeather API Key</label>
+                    <input type="password" id="input-weather-key" class="w-full px-3 py-2.5 text-sm rounded-xl bg-[#09090b] border border-[#27272a] focus:outline-none focus:border-[#d4af37] text-[#f4f4f5] transition-colors">
+                </div>
+                <div>
+                    <label class="block text-[10px] uppercase tracking-widest text-[#a1a1aa] mb-1.5">Gemini AI API Key</label>
+                    <input type="password" id="input-gemini-key" class="w-full px-3 py-2.5 text-sm rounded-xl bg-[#09090b] border border-[#27272a] focus:outline-none focus:border-[#d4af37] text-[#f4f4f5] transition-colors">
+                </div>
+                <div>
+                    <label class="block text-[10px] uppercase tracking-widest text-[#a1a1aa] mb-1.5">Città</label>
+                    <input type="text" id="input-city" class="w-full px-3 py-2.5 text-sm rounded-xl bg-[#09090b] border border-[#27272a] focus:outline-none focus:border-[#d4af37] text-[#f4f4f5] transition-colors">
+                </div>
+                <button onclick="saveSettings()" class="w-full py-3 mt-2 text-xs font-semibold tracking-widest uppercase rounded-xl bg-gradient-to-r from-[#d4af37] to-[#aa7c11] text-[#09090b] font-bold transition-all active:scale-[0.99]">
+                    Salva Configurazione
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 w-full max-w-md mx-auto px-4 overflow-y-auto no-scrollbar">
+        
+        <section id="sec-dashboard" class="space-y-5 py-2">
+            <div class="p-4 rounded-2xl bg-[#0e0e11] border border-[#1f1f23] flex justify-between items-center">
+                <div>
+                    <p class="text-[10px] text-[#a1a1aa] uppercase tracking-widest font-medium" id="txt-weather-city">Località</p>
+                    <p class="text-lg font-medium text-[#f4f4f5] mt-0.5 tracking-wide" id="txt-weather-desc">Configura il meteo</p>
+                </div>
+                <p class="text-3xl font-light text-[#d4af37] tracking-tighter" id="txt-weather-temp">--°</p>
+            </div>
+
+            <div class="p-5 rounded-2xl bg-[#0e0e11] border border-[#27272a] relative overflow-hidden shadow-xl">
+                <div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#d4af37] to-transparent"></div>
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-[10px] font-semibold uppercase tracking-widest text-[#d4af37] flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a3 3 0 00-3-3H7.2m5.7 3a3 3 0 013 3v1.5m-3-4.518A3 3 0 0115.75 6h2.25m-12 0h2.25M12 3a9 9 0 110 18 9 9 0 010-18z" />
+                        </svg>
+                        Il Consiglio del Cervello
+                    </h3>
+                    <button onclick="fetchGeminiAdvice()" id="btn-refresh-brain" class="text-[10px] font-medium tracking-wider uppercase text-[#a1a1aa] hover:text-[#d4af37] transition-colors">
+                        Aggiorna
+                    </button>
+                </div>
+                <p id="txt-brain-advice" class="text-sm text-[#e4e4e7] leading-relaxed font-light italic">
+                    Configura le tue API Key nelle impostazioni per sbloccare il Consiglio del Cervelletto.
+                </p>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-[#0e0e11] border border-[#1f1f23] space-y-3">
+                <div class="flex justify-between items-start border-b border-[#1f1f23] pb-3">
+                    <div>
+                        <span class="text-[9px] font-semibold uppercase tracking-widest text-[#a1a1aa] block mb-0.5">Turno Odierno</span>
+                        <span id="widget-today-shift-code" class="text-2xl font-semibold text-[#d4af37] luxury-title">--</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[9px] font-semibold uppercase tracking-widest text-[#a1a1aa] block mb-0.5">Orario Operativo</span>
+                        <span id="widget-today-shift-hours" class="text-sm text-[#f4f4f5] font-medium">Nessuno</span>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center text-xs">
+                    <span class="text-[#a1a1aa] font-light">Intervallo Pausa Mensa:</span>
+                    <span id="widget-today-shift-breaks" class="font-medium text-[#f4f4f5]">--:--</span>
+                </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-[#0e0e11] border border-[#1f1f23] relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-3 text-[#d4af37]/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                    </svg>
+                </div>
+                <h4 class="text-[10px] font-semibold uppercase tracking-widest text-[#d4af37] mb-3 flex items-center gap-1.5">
+                    Allineamento Circadiano
+                </h4>
+                <div class="space-y-2.5">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-[#a1a1aa] font-light">Coprifuoco Caffeina:</span>
+                        <span id="circadian-caffeine" class="font-semibold text-amber-500">--:--</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-[#a1a1aa] font-light">Finestra Sonno Ottimale:</span>
+                        <span id="circadian-sleep" class="font-medium text-[#f4f4f5]">--:--</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-[#a1a1aa] font-light">Picco Energetico (Luce/Allenamento):</span>
+                        <span id="circadian-light" class="font-medium text-[#e4e4e7]">--:--</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-[#0e0e11] border border-[#1f1f23] flex justify-between items-center">
+                <div>
+                    <span class="text-[9px] font-semibold uppercase tracking-widest text-[#a1a1aa] block">Liquidità Odierna Disponibile</span>
+                    <span id="widget-today-budget" class="text-lg font-medium text-[#d4af37] mt-0.5 block">0.00 €</span>
+                </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-[#0e0e11] border border-[#1f1f23] flex justify-between items-center">
+                <div>
+                    <span class="text-[9px] font-semibold uppercase tracking-widest text-[#a1a1aa] block">Focus Allenamento Oggi</span>
+                    <span id="widget-workout-name" class="text-base font-medium text-[#f4f4f5] mt-0.5 block">Riposo</span>
+                </div>
+                <label class="relative flex items-center cursor-pointer">
+                    <input type="checkbox" id="chk-workout-complete" onchange="toggleWorkoutComplete()" class="sr-only peer">
+                    <div class="w-10 h-5 bg-[#27272a] rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-[#a1a1aa] after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#d4af37] peer-checked:after:bg-[#09090b]"></div>
+                </label>
+            </div>
+        </section>
+
+        <section id="sec-budget" class="hidden space-y-5 py-2">
+            <div class="p-4 rounded-2xl bg-[#0e0e11] border border-[#1f1f23]">
+                <h3 class="text-[10px] font-semibold uppercase tracking-widest text-[#a1a1aa] mb-3">Budget Mensile Totale</h3>
+                <div class="flex gap-2">
+                    <input type="text" id="input-monthly-budget" placeholder="Es. 1500" class="flex-1 px-3 py-2 text-sm rounded-xl bg-[#09090b] border border-[#27272a] focus:outline-none focus:border-[#d4af37] text-[#f4f4f5] transition-colors">
+                    <button onclick="setMonthlyBudget()" class="px-4 py-2 text-xs font-semibold tracking-wider uppercase rounded-xl bg-[#d4af37] text-[#09090b] font-bold transition-colors">
+                        Imposta
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-5 rounded-2xl bg-[#0e0e11] border border-[#27272a] space-y-4">
+                <div class="flex justify-between items-end">
+                    <div>
+                        <p class="text-[10px] text-[#a1a1aa] uppercase tracking-widest">Disponibilità Giornaliera</p>
+                        <p class="text-3xl font-light text-[#d4af37] mt-1 luxury-title" id="calc-daily-allowance">0.00 €</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[11px] text-[#e4e4e7] font-light"><span id="calc-days-left" class="font-medium text-[#d4af37]">0</span> giorni al reset</p>
+                        <p class="text-[11px] text-[#a1a1aa]" id="calc-remaining-pool">Residuo: 0.00 €</p>
+                    </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <div class="w-full bg-[#09090b] rounded-full h-1.5 overflow-hidden border border-[#1f1f23]">
+                        <div id="budget-progress-bar" class="bg-gradient-to-r from-[#aa7c11] via-[#d4af37] to-[#f3e7c4] h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <div class="flex justify-between text-[10px] text-[#a1a1aa] font-light tracking-wide">
+                        <span id="label-spent-today">Speso: 0.00 €</span>
+                        <span id="label-left-today">Rimasto: 0.00 €</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-[#0e0e11] border border-[#1f1f23]">
+                <h3 class="text-[10px] font-semibold uppercase tracking-widest text-[#a1a1aa] mb-3">Registra Spesa</h3>
+                <div class="space-y-2.5">
+                    <input type="text" id="input-expense-desc" placeholder="Descrizione" class="w-full px-3 py-2.5 text-sm rounded-xl bg-[#09090b] border border-[#27272a] focus:outline-none focus:border-[#d4af37] text-[#f4f4f5] transition-colors">
+                    <div class="flex gap-2">
+                        <input type="text" id="input-expense-amount" placeholder="Importo (€)" class="flex-1 px-3 py-2.5 text-sm rounded-xl bg-[#09090b] border border-[#27272a] focus:outline-none focus:border-[#d4af37] text-[#f4f4f5] transition-colors">
+                        <button onclick="addExpense()" class="px-5 py-2.5 text-xs font-semibold tracking-wider uppercase rounded-xl bg-[#f4f4f5] text-[#09090b] font-bold transition-colors">
+                            Inserisci
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-[#0e0e11] border border-[#1f1f23]">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-[10px] font-semibold uppercase tracking-widest text-[#a1a1aa]">Spese di Oggi</h3>
+                    <button onclick="clearExpenses()" class="text-[10px] tracking-wide text-[#666] hover:text-red-400 transition-colors uppercase">Azzera</button>
+                </div>
+                <div id="expense-list" class="space-y-2 max-h-40 overflow-y-auto">
+                    <p class="text-xs text-[#666] text-center py-2">Nessuna spesa inserita.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-shifts" class="hidden space-y-4 py-2">
+            <div class="p-4 rounded-2xl bg-[#0e0e11] border border-[#1f1f23]">
+                <h3 class="text-[10px] font-semibold uppercase tracking-widest text-[#d4af37] mb-2">Pianificazione Turni</h3>
+                <p class="text-[11px] text-[#a1a1aa] font-light mb-4">Usa la codifica ufficiale della tua legenda aziendale.</p>
+                <div id="shifts-container" class="space-y-2.5"></div>
+            </div>
+        </section>
+
+        <section id="sec-workout" class="hidden space-y-4 py-2">
+            <div class="p-4 rounded-2xl bg-[#0e0e11] border border-[#1f1f23]">
+                <h3 class="text-[10px] font-semibold uppercase tracking-widest text-[#d4af37] mb-2">Pianificazione Allenamenti</h3>
+                <p class="text-[11px] text-[#a1a1aa] font-light mb-4">Associa a ciascun giorno l'attività atletica dedicata.</p>
+                <div id="workout-container" class="space-y-2.5"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#09090b]/95 border-t border-[#1f1f23] backdrop-blur-xl px-2 pt-3 pb-6 flex justify-around items-center z-50">
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center text-[#d4af37] transition-all active:scale-90 w-16">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+            </svg>
+            <span class="text-[9px] uppercase tracking-wider font-medium mt-1">Home</span>
+        </button>
+
+        <button onclick="switchTab('budget')" id="nav-budget" class="flex flex-col items-center text-[#a1a1aa] transition-all active:scale-90 w-16">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.214.165c.493.38 1.147.568 1.786.568 1.28 0 2.318-1.03 2.318-2.318 0-1.28-1.038-2.318-2.318-2.318-.64 0-1.293-.188-1.786-.568l-.214-.165m0 0a3.997 3.997 0 010-6.364l.214.165c.493.38 1.147.568 1.786.568 1.28 0 2.318-1.03 2.318 2.318 0 1.28-1.038-2.318-2.318 2.318-.64 0-1.293.188-1.786.568l-.214-.165m0 0V6m0 12v2m0-14V4" />
+            </svg>
+            <span class="text-[9px] uppercase tracking-wider font-medium mt-1">Budget</span>
+        </button>
+
+        <button onclick="switchTab('shifts')" id="nav-shifts" class="flex flex-col items-center text-[#a1a1aa] transition-all active:scale-90 w-16">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
+            </svg>
+            <span class="text-[9px] uppercase tracking-wider font-medium mt-1">Turni</span>
+        </button>
+
+        <button onclick="switchTab('workout')" id="nav-workout" class="flex flex-col items-center text-[#a1a1aa] transition-all active:scale-90 w-16">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+            </svg>
+            <span class="text-[9px] uppercase tracking-wider font-medium mt-1">Workout</span>
+        </button>
+    </nav>
+
+    <script>
+        const daysOfWeek = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
+
+        // Mappatura strutturata dei turni estratti dall'immagine aziendale dell'utente
+        const shiftDatabase = {
+            "AP": { hours: "10:20 - 19:00", breaks: "11:30", caffeineCutoff: "13:00", optimalSleep: "22:30 - 06:30", peakEnergy: "07:30 - 09:30 (Pre-Turno)" },
+            "AP2": { hours: "10:20 - 14:00, 18:00 - 24:00", breaks: "11:30 e 19:00", caffeineCutoff: "16:00", optimalSleep: "01:30 - 08:30", peakEnergy: "14:30 - 16:30 (Break-Turno)" },
+            "IN1": { hours: "11:30 - 20:30", breaks: "12:15 e 18:15", caffeineCutoff: "14:30", optimalSleep: "23:30 - 07:30", peakEnergy: "08:30 - 10:30 (Pre-Turno)" },
+            "IN2": { hours: "14:00 - 22:30", breaks: "18:15", caffeineCutoff: "15:30", optimalSleep: "00:30 - 08:30", peakEnergy: "10:00 - 12:00 (Pre-Turno)" },
+            "CH": { hours: "15:30 - 24:00", breaks: "19:00", caffeineCutoff: "16:00", optimalSleep: "01:30 - 09:15", peakEnergy: "11:00 - 13:30 (Pre-Turno)" },
+            "SP": { hours: "12:00 - 15:30, 19:00 - 24:00", breaks: "19:00", caffeineCutoff: "16:00", optimalSleep: "01:30 - 08:30", peakEnergy: "16:30 - 18:00 (Break-Turno)" },
+            "Riposo": { hours: "Nessuno", breaks: "Nessuna pausa", caffeineCutoff: "Flessibile", optimalSleep: "Recupero Libero", peakEnergy: "Pomeriggio Pomeridiano" }
+        };
+
+        let appState = {
+            monthlyBudget: parseFloat(localStorage.getItem('monthlyBudget')) || 0,
+            expenses: JSON.parse(localStorage.getItem('expenses')) || [],
+            shifts: JSON.parse(localStorage.getItem('shifts')) || { "Lunedì":"Riposo", "Martedì":"Riposo", "Mercoledì":"Riposo", "Giovedì":"Riposo", "Venerdì":"Riposo", "Sabato":"Riposo", "Domenica":"Riposo" },
+            workouts: JSON.parse(localStorage.getItem('workouts')) || { "Lunedì":"Riposo", "Martedì":"Riposo", "Mercoledì":"Riposo", "Giovedì":"Riposo", "Venerdì":"Riposo", "Sabato":"Riposo", "Domenica":"Riposo" },
+            workoutCompleted: JSON.parse(localStorage.getItem('workoutCompleted')) || {},
+            weatherKey: localStorage.getItem('weatherKey') || '',
+            geminiKey: localStorage.getItem('geminiKey') || '',
+            city: localStorage.getItem('city') || 'Trento'
+        };
+
+        window.onload = function() {
+            setDynamicDate();
+            initializeShiftsUI();
+            initializeWorkoutUI();
+            syncSettingsDOM();
+            calculateBudgetCore();
+            renderExpensesList();
+            renderDashboardWidgets();
+            fetchWeatherData();
+            if (appState.geminiKey && appState.weatherKey) {
+                fetchGeminiAdvice();
+            }
+        };
+
+        function setDynamicDate() {
+            const options = { weekday: 'long', day: 'numeric', month: 'long' };
+            let dateStr = new Date().toLocaleDateString('it-IT', options);
+            dateStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+            document.getElementById('current-date-string').innerText = dateStr;
+        }
+
+        function syncSettingsDOM() {
+            document.getElementById('input-weather-key').value = appState.weatherKey;
+            document.getElementById('input-gemini-key').value = appState.geminiKey;
+            document.getElementById('input-city').value = appState.city;
+            document.getElementById('input-monthly-budget').value = appState.monthlyBudget || '';
+        }
+
+        function toggleSettings() {
+            document.getElementById('settings-panel').classList.toggle('hidden');
+        }
+
+        function saveSettings() {
+            appState.weatherKey = document.getElementById('input-weather-key').value.trim();
+            appState.geminiKey = document.getElementById('input-gemini-key').value.trim();
+            appState.city = document.getElementById('input-city').value.trim() || 'Trento';
+            localStorage.setItem('weatherKey', appState.weatherKey);
+            localStorage.setItem('geminiKey', appState.geminiKey);
+            localStorage.setItem('city', appState.city);
+            alert('Impostazioni di sistema salvate.');
+            toggleSettings();
+            fetchWeatherData();
+            fetchGeminiAdvice();
+        }
+
+        function switchTab(tabId) {
+            document.getElementById('sec-dashboard').classList.add('hidden');
+            document.getElementById('sec-budget').classList.add('hidden');
+            document.getElementById('sec-shifts').classList.add('hidden');
+            document.getElementById('sec-workout').classList.add('hidden');
+
+            const navIds = ['nav-dashboard', 'nav-budget', 'nav-shifts', 'nav-workout'];
+            navIds.forEach(id => {
+                document.getElementById(id).classList.remove('text-[#d4af37]');
+                document.getElementById(id).classList.add('text-[#a1a1aa]');
+            });
+
+            document.getElementById('sec-' + tabId).classList.remove('hidden');
+            document.getElementById('nav-' + tabId).classList.add('text-[#d4af37]');
+            document.getElementById('nav-' + tabId).classList.remove('text-[#a1a1aa]');
+            
+            if(tabId === 'dashboard') renderDashboardWidgets();
+            if(tabId === 'budget') calculateBudgetCore();
+        }
+
+        function setMonthlyBudget() {
+            const rawInput = document.getElementById('input-monthly-budget').value;
+            const sanitized = parseFloat(rawInput.replace(/,/g, '.'));
+            if (isNaN(sanitized) || sanitized <= 0) {
+                alert("Errore. Inserisci un parametro numerico valido.");
+                return;
+            }
+            appState.monthlyBudget = sanitized;
+            localStorage.setItem('monthlyBudget', sanitized);
+            calculateBudgetCore();
+            alert("Budget strutturato memorizzato.");
+        }
+
+        function calculateBudgetCore() {
+            const now = new Date();
+            const totalDaysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            const daysLeft = (totalDaysInMonth - now.getDate()) + 1;
+            const totalSpentThisMonth = appState.expenses.reduce((sum, current) => sum + current.amount, 0);
+            const remainingPool = Math.max(0, appState.monthlyBudget - totalSpentThisMonth);
+            const dailyAllowance = daysLeft > 0 ? (remainingPool / daysLeft) : remainingPool;
+
+            const todayStr = now.toISOString().split('T')[0];
+            const spentToday = appState.expenses.filter(exp => exp.date === todayStr).reduce((sum, current) => sum + current.amount, 0);
+            const leftToday = Math.max(0, dailyAllowance - spentToday);
+
+            let progressPercent = dailyAllowance > 0 ? (spentToday / dailyAllowance) * 100 : 0;
+            if (progressPercent > 100) progressPercent = 100;
+
+            document.getElementById('calc-daily-allowance').innerText = dailyAllowance.toFixed(2) + " €";
+            document.getElementById('calc-days-left').innerText = daysLeft;
+            document.getElementById('calc-remaining-pool').innerText = "Residuo: " + remainingPool.toFixed(2) + " €";
+            document.getElementById('budget-progress-bar').style.width = progressPercent + "%";
+            document.getElementById('label-spent-today').innerText = "Speso: " + spentToday.toFixed(2) + " €";
+            document.getElementById('label-left-today').innerText = "Rimasto: " + leftToday.toFixed(2) + " €";
+            document.getElementById('widget-today-budget').innerText = leftToday.toFixed(2) + " €";
+            document.getElementById('widget-today-budget').className = leftToday <= 0 && dailyAllowance > 0 ? "text-lg font-medium text-red-400 mt-0.5 block" : "text-lg font-medium text-[#d4af37] mt-0.5 block";
+        }
+
+        function addExpense() {
+            const descInput = document.getElementById('input-expense-desc').value.trim();
+            const amountInput = document.getElementById('input-expense-amount').value.trim();
+            const parsedAmount = parseFloat(amountInput.replace(/,/g, '.'));
+
+            if(!descInput || isNaN(parsedAmount) || parsedAmount <= 0) {
+                alert("Verificare i dettagli della spesa.");
+                return;
+            }
+
+            appState.expenses.push({ id: Date.now(), description: descInput, amount: parsedAmount, date: new Date().toISOString().split('T')[0] });
+            localStorage.setItem('expenses', JSON.stringify(appState.expenses));
+            document.getElementById('input-expense-desc').value = '';
+            document.getElementById('input-expense-amount').value = '';
+            calculateBudgetCore();
+            renderExpensesList();
+        }
+
+        function renderExpensesList() {
+            const listContainer = document.getElementById('expense-list');
+            const todayStr = new Date().toISOString().split('T')[0];
+            const todayExpenses = appState.expenses.filter(exp => exp.date === todayStr);
+
+            if(todayExpenses.length === 0) {
+                listContainer.innerHTML = '<p class="text-xs text-[#666] text-center py-2">Nessuna transazione registrata.</p>';
+                return;
+            }
+            listContainer.innerHTML = '';
+            todayExpenses.forEach(exp => {
+                const item = document.createElement('div');
+                item.className = "flex justify-between items-center bg-[#09090b] p-3 rounded-xl border border-[#1f1f23] text-xs";
+                item.innerHTML = `<span class="text-[#a1a1aa] font-light">${exp.description}</span><span class="font-medium text-[#f4f4f5]">${exp.amount.toFixed(2)} €</span>`;
+                listContainer.appendChild(item);
+            });
+        }
+
+        function clearExpenses() {
+            if(confirm("Azzerare lo storico transazioni odierno?")) {
+                appState.expenses = [];
+                localStorage.setItem('expenses', JSON.stringify([]));
+                calculateBudgetCore();
+                renderExpensesList();
+            }
+        }
+
+        function initializeShiftsUI() {
+            const container = document.getElementById('shifts-container');
+            container.innerHTML = '';
+            daysOfWeek.forEach(giorno => {
+                const selectedTurno = appState.shifts[giorno] || "Riposo";
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center bg-[#09090b] p-3 rounded-xl border border-[#1f1f23]";
+                
+                let optionsHTML = '';
+                Object.keys(shiftDatabase).forEach(code => {
+                    optionsHTML += `<option value="${code}" ${selectedTurno === code ? 'selected' : ''}>${code}</option>`;
+                });
+
+                div.innerHTML = `
+                    <span class="text-xs font-light text-[#e4e4e7]">${giorno}</span>
+                    <select onchange="updateShift('${giorno}', this.value); triggerCircadianUpdate();" class="text-xs bg-[#0e0e11] border border-[#27272a] rounded-lg px-2.5 py-1.5 font-medium text-[#f4f4f5] focus:outline-none focus:border-[#d4af37]">
+                        ${optionsHTML}
+                    </select>`;
+                container.appendChild(div);
+            });
+        }
+
+        function updateShift(giorno, valore) {
+            appState.shifts[giorno] = valore;
+            localStorage.setItem('shifts', JSON.stringify(appState.shifts));
+        }
+
+        function triggerCircadianUpdate() {
+            if(document.getElementById('sec-dashboard').classList.contains('hidden') === false) {
+                renderDashboardWidgets();
+            }
+        }
+
+        function initializeWorkoutUI() {
+            const container = document.getElementById('workout-container');
+            container.innerHTML = '';
+            daysOfWeek.forEach(giorno => {
+                const currentRoutine = appState.workouts[giorno] || "Riposo";
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center bg-[#09090b] p-3 rounded-xl border border-[#1f1f23] gap-4";
+                div.innerHTML = `
+                    <span class="text-xs font-light text-[#e4e4e7] w-20 shrink-0">${giorno}</span>
+                    <input type="text" value="${currentRoutine}" onchange="updateWorkout('${giorno}', this.value)" class="flex-1 text-xs bg-[#0e0e11] border border-[#27272a] rounded-lg px-3 py-1 text-[#f4f4f5] focus:outline-none focus:border-[#d4af37]">`;
+                container.appendChild(div);
+            });
+        }
+
+        function updateWorkout(giorno, valore) {
+            appState.workouts[giorno] = valore.trim() || "Riposo";
+            localStorage.setItem('workouts', JSON.stringify(appState.workouts));
+        }
+
+        function renderDashboardWidgets() {
+            const index = new Date().getDay();
+            const oggi = daysOfWeek[index === 0 ? 6 : index - 1];
+            // Estrazione del giorno di domani per pianificazione energetica e sonno avanzata
+            const domani = daysOfWeek[index === 0 ? 0 : index];
+            
+            const codeOggi = appState.shifts[oggi] || "Riposo";
+            const codeDomani = appState.shifts[domani] || "Riposo";
+            const shiftDetails = shiftDatabase[codeOggi] || shiftDatabase["Riposo"];
+            const shiftDetailsDomani = shiftDatabase[codeDomani] || shiftDatabase["Riposo"];
+
+            // Rendering Widget Turno
+            document.getElementById('widget-today-shift-code').innerText = codeOggi;
+            document.getElementById('widget-today-shift-hours').innerText = shiftDetails.hours;
+            document.getElementById('widget-today-shift-breaks').innerText = shiftDetails.breaks;
+
+            // Logica e calcolo del Bio-Allineamento Circadiano
+            document.getElementById('circadian-caffeine').innerText = shiftDetails.caffeineCutoff;
+            document.getElementById('circadian-light').innerText = shiftDetails.peakEnergy;
+            
+            // La finestra di sonno ottimale stasera dipende in modo critico dal turno di domani mattina/pomeriggio
+            document.getElementById('circadian-sleep').innerText = shiftDetailsDomani.optimalSleep;
+
+            // Ripristino Widget Workout
+            document.getElementById('widget-workout-name').innerText = appState.workouts[oggi] || "Riposo";
+            const todayStr = new Date().toISOString().split('T')[0];
+            document.getElementById('chk-workout-complete').checked = !!appState.workoutCompleted[todayStr];
+        }
+
+        function toggleWorkoutComplete() {
+            const todayStr = new Date().toISOString().split('T')[0];
+            appState.workoutCompleted[todayStr] = document.getElementById('chk-workout-complete').checked;
+            localStorage.setItem('workoutCompleted', JSON.stringify(appState.workoutCompleted));
+        }
+
+        let cacheWeatherText = "Meteo non disponibile";
+
+        function fetchWeatherData() {
+            if (!appState.weatherKey) return;
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(appState.city)}&appid=${appState.weatherKey}&units=metric&lang=it`)
+                .then(res => res.json())
+                .then(data => {
+                    const temp = Math.round(data.main.temp);
+                    let desc = data.weather[0].description;
+                    desc = desc.charAt(0).toUpperCase() + desc.slice(1);
+                    document.getElementById('txt-weather-city').innerText = `Meteo: ${data.name}`;
+                    document.getElementById('txt-weather-desc').innerText = desc;
+                    document.getElementById('txt-weather-temp').innerText = `${temp}°`;
+                    cacheWeatherText = `${desc}, ${temp}°C`;
+                }).catch(() => {
+                    document.getElementById('txt-weather-desc').innerText = "Meteo offline";
+                });
+        }
+
+        function fetchGeminiAdvice() {
+            const adviceContainer = document.getElementById('txt-brain-advice');
+            const refreshBtn = document.getElementById('btn-refresh-brain');
+            if (!appState.geminiKey) return;
+
+            refreshBtn.innerText = "...";
+            adviceContainer.innerHTML = '<span class="text-[#666] italic animate-pulse">Analisi neurale in corso...</span>';
+
+            const index = new Date().getDay();
+            const oggi = daysOfWeek[index === 0 ? 6 : index - 1];
+            const domani = daysOfWeek[index === 0 ? 0 : index];
+            const codeOggi = appState.shifts[oggi] || "Riposo";
+            const codeDomani = appState.shifts[domani] || "Riposo";
+            const shiftDetails = shiftDatabase[codeOggi] || shiftDatabase["Riposo"];
+            const shiftDetailsDomani = shiftDatabase[codeDomani] || shiftDatabase["Riposo"];
+
+            const corePrompt = `Agisci come un bio-hacking coach e assistente personale d'élite. Contesto attuale dell'utente:
+            - Città: ${appState.city}
+            - Meteo: ${cacheWeatherText}
+            - Turno Lavoro Oggi: ${codeOggi} (Orario: ${shiftDetails.hours}, Pausa: ${shiftDetails.breaks})
+            - Turno Lavoro Domani: ${codeDomani} (Pianificazione sonno richiesta per: ${shiftDetailsDomani.optimalSleep})
+            - Focus Allenamento: ${appState.workouts[oggi]}
+            - Coprifuoco Caffeina Consigliato: ${shiftDetails.caffeineCutoff}
+            - Finestra Picco Energetico: ${shiftDetails.peakEnergy}
+            - Budget economico rimasto oggi: ${document.getElementById('widget-today-budget').innerText}
+
+            Genera un singolo consiglio pratico, tagliente e motivazionale di MASSIMO 3 righe. Spiega all'utente come ottimizzare i suoi livelli di energia e incastrare l'allenamento in base ai turni e alle pause odierne e del giorno dopo, senza tralasciare il budget. Usa un tono luxury, esclusivo ed estremamente mirato. Nessun preambolo o saluto.`;
+
+            fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${appState.geminiKey}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ contents: [{ parts: [{ text: corePrompt }] }] })
+            })
+            .then(res => res.json())
+            .then(data => {
+                adviceContainer.innerText = data.candidates[0].content.parts[0].text.trim();
+            })
+            .catch(() => {
+                adviceContainer.innerText = "Impossibile elaborare il consiglio neurale.";
+            })
+            .finally(() => {
+                refreshBtn.innerText = "Aggiorna";
+            });
+        }
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('Service Worker registered:', reg.scope))
+                .catch(err => console.warn('Service Worker registration failed:', err));
+            });
+        }
+    </script>
+</body>
+</html>
