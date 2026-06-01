@@ -31,3 +31,4 @@ git push -u origin main
 Note:
 - iPhone richiede HTTPS e che il sito sia servito via HTTPS per installare la PWA.
 - puoi sostituire le icone remote con file locali in `icons/` e aggiornare `manifest.json`.
+# GiuliOS-Life
