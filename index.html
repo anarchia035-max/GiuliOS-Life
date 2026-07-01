@@ -393,6 +393,7 @@
                 "AP": { hours: "10:00 - 18:30", breaks: "11:30", caffeineCutoff: "12:30", optimalSleep: "22:00 - 06:00", peakEnergy: "07:00 - 08:30 (Pre-Turno)" },
                 "IN": { hours: "11:00 - 19:30", breaks: "12:30", caffeineCutoff: "13:30", optimalSleep: "23:00 - 07:00", peakEnergy: "08:00 - 09:30 (Pre-Turno)" },
                 "SP": { hours: "12:30 - 15:30, 18:00 - 23:30", breaks: "19:00", caffeineCutoff: "16:00", optimalSleep: "01:00 - 08:00", peakEnergy: "16:00 - 17:30 (Break-Turno)" },
+                "CH": { hours: "19:00 - 02:00", breaks: "21:00", caffeineCutoff: "17:00", optimalSleep: "03:00 - 10:00", peakEnergy: "17:00 - 18:30 (Pre-Turno)" },
                 "OFF": { hours: "Nessuno", breaks: "Nessuna pausa", caffeineCutoff: "Flessibile", optimalSleep: "Recupero Libero", peakEnergy: "Pomeriggio Libero" }
             };
 
@@ -401,8 +402,9 @@
                 const raw = localStorage.getItem('customShiftDatabase');
                 const parsed = safeParse(raw, null);
                 if (parsed && typeof parsed === 'object') {
-                    // ensure OFF exists
+                    // ensure OFF and CH exist even in older saved configs
                     if (!parsed.OFF) parsed.OFF = defaultShiftDatabase.OFF;
+                    if (!parsed.CH) parsed.CH = defaultShiftDatabase.CH;
                     return parsed;
                 }
                 return defaultShiftDatabase;
