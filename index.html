@@ -424,7 +424,12 @@
             };
 
             // --- Helpers: date & ore lavorate ---
-            function isoDate(d) { return d.toISOString().split('T')[0]; }
+            function isoDate(d) {
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
 
             function timeToMinutes(t) {
                 const parts = t.trim().split(':').map(Number);
@@ -574,7 +579,7 @@
                 const remainingPool = Math.max(0, appState.monthlyBudget - totalSpentThisMonth);
                 const dailyAllowance = daysLeft > 0 ? (remainingPool / daysLeft) : remainingPool;
 
-                const todayStr = now.toISOString().split('T')[0];
+                const todayStr = isoDate(now);
                 const spentToday = appState.expenses.filter(exp => exp.date === todayStr).reduce((sum, current) => sum + current.amount, 0);
                 const leftToday = Math.max(0, dailyAllowance - spentToday);
 
@@ -601,7 +606,7 @@
                     return;
                 }
 
-                appState.expenses.push({ id: Date.now(), description: descInput, amount: parsedAmount, date: new Date().toISOString().split('T')[0] });
+                appState.expenses.push({ id: Date.now(), description: descInput, amount: parsedAmount, date: isoDate(new Date()) });
                 localStorage.setItem('expenses', JSON.stringify(appState.expenses));
                 document.getElementById('input-expense-desc').value = '';
                 document.getElementById('input-expense-amount').value = '';
@@ -612,7 +617,7 @@
 
             function renderExpensesList() {
                 const listContainer = document.getElementById('expense-list');
-                const todayStr = new Date().toISOString().split('T')[0];
+                const todayStr = isoDate(new Date());
                 const todayExpenses = appState.expenses.filter(exp => exp.date === todayStr);
 
                 if(todayExpenses.length === 0) {
@@ -768,12 +773,12 @@
                 document.getElementById('circadian-sleep').innerText = shiftDetailsDomani.optimalSleep || "Recupero Libero";
 
                 document.getElementById('widget-workout-name').innerText = appState.workouts[oggi] || "Riposo";
-                const todayStr = new Date().toISOString().split('T')[0];
+                const todayStr = isoDate(new Date());
                 document.getElementById('chk-workout-complete').checked = !!appState.workoutCompleted[todayStr];
             }
 
             function toggleWorkoutComplete() {
-                const todayStr = new Date().toISOString().split('T')[0];
+                const todayStr = isoDate(new Date());
                 appState.workoutCompleted[todayStr] = document.getElementById('chk-workout-complete').checked;
                 localStorage.setItem('workoutCompleted', JSON.stringify(appState.workoutCompleted));
             }
