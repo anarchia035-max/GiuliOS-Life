@@ -67,6 +67,14 @@
                         <label class="block text-[10px] uppercase tracking-widest text-[#a1a1aa] mb-1.5">Città</label>
                         <input type="text" id="input-city" class="w-full px-3 py-2.5 text-sm rounded-xl bg-[#09090b] border border-[#27272a] focus:outline-none focus:border-[#d4af37] text-[#f4f4f5] transition-colors">
                     </div>
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-widest text-[#a1a1aa] mb-1.5">JSONBin Bin ID (Passi Apple Salute)</label>
+                        <input type="text" id="input-jsonbin-id" class="w-full px-3 py-2.5 text-sm rounded-xl bg-[#09090b] border border-[#27272a] focus:outline-none focus:border-[#d4af37] text-[#f4f4f5] transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-widest text-[#a1a1aa] mb-1.5">JSONBin API Key</label>
+                        <input type="password" id="input-jsonbin-key" class="w-full px-3 py-2.5 text-sm rounded-xl bg-[#09090b] border border-[#27272a] focus:outline-none focus:border-[#d4af37] text-[#f4f4f5] transition-colors">
+                    </div>
                     <button onclick="saveSettings()" class="w-full py-3 mt-2 text-xs font-semibold tracking-widest uppercase rounded-xl bg-gradient-to-r from-[#d4af37] to-[#aa7c11] text-[#09090b] font-bold transition-all active:scale-[0.99]">
                         Salva Configurazione
                     </button>
@@ -177,6 +185,14 @@
                         <input type="checkbox" id="chk-workout-complete" onchange="toggleWorkoutComplete()" class="sr-only peer">
                         <div class="w-10 h-5 bg-[#27272a] rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-[#a1a1aa] after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#d4af37] peer-checked:after:bg-[#09090b]"></div>
                     </label>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-[#0e0e11] border border-[#1f1f23] flex justify-between items-center">
+                    <div>
+                        <span class="text-[9px] font-semibold uppercase tracking-widest text-[#a1a1aa] block">Passi Oggi (Apple Salute)</span>
+                        <span id="widget-steps-today" class="text-base font-medium text-[#f4f4f5] mt-0.5 block">--</span>
+                    </div>
+                    <span id="widget-steps-status" class="text-[9px] uppercase tracking-widest text-[#666]"></span>
                 </div>
             </section>
 
@@ -467,7 +483,9 @@
                 goals: safeParse(localStorage.getItem('goals'), []),
                 weatherKey: localStorage.getItem('weatherKey') || '',
                 geminiKey: localStorage.getItem('geminiKey') || '',
-                city: localStorage.getItem('city') || 'Trento'
+                city: localStorage.getItem('city') || 'Trento',
+                jsonbinId: localStorage.getItem('jsonbinId') || '',
+                jsonbinKey: localStorage.getItem('jsonbinKey') || ''
             };
 
             // --- Helpers: date & ore lavorate ---
@@ -548,6 +566,7 @@
                 renderGoals();
                 fetchWeatherData();
                 if (appState.geminiKey && appState.weatherKey) fetchGeminiAdvice();
+                fetchStepsData();
             };
 
             function setDynamicDate() {
@@ -561,6 +580,8 @@
                 document.getElementById('input-weather-key').value = appState.weatherKey;
                 document.getElementById('input-gemini-key').value = appState.geminiKey;
                 document.getElementById('input-city').value = appState.city;
+                document.getElementById('input-jsonbin-id').value = appState.jsonbinId;
+                document.getElementById('input-jsonbin-key').value = appState.jsonbinKey;
                 document.getElementById('input-monthly-budget').value = appState.monthlyBudget || '';
             }
 
@@ -572,16 +593,56 @@
                 appState.weatherKey = document.getElementById('input-weather-key').value.trim();
                 appState.geminiKey = document.getElementById('input-gemini-key').value.trim();
                 appState.city = document.getElementById('input-city').value.trim() || 'Trento';
+                appState.jsonbinId = document.getElementById('input-jsonbin-id').value.trim();
+                appState.jsonbinKey = document.getElementById('input-jsonbin-key').value.trim();
                 localStorage.setItem('weatherKey', appState.weatherKey);
                 localStorage.setItem('geminiKey', appState.geminiKey);
                 localStorage.setItem('city', appState.city);
+                localStorage.setItem('jsonbinId', appState.jsonbinId);
+                localStorage.setItem('jsonbinKey', appState.jsonbinKey);
                 alert('Impostazioni di sistema salvate.');
                 toggleSettings();
                 fetchWeatherData();
                 fetchGeminiAdvice();
+                fetchStepsData();
             }
 
-            const BACKUP_KEYS = ['monthlyBudget', 'expenses', 'shifts', 'workouts', 'workoutCompleted', 'workLog', 'goals', 'weatherKey', 'geminiKey', 'city', 'customShiftDatabase'];
+            function fetchStepsData() {
+                const stepsEl = document.getElementById('widget-steps-today');
+                const statusEl = document.getElementById('widget-steps-status');
+                if (!stepsEl || !statusEl) return;
+
+                if (!appState.jsonbinId || !appState.jsonbinKey) {
+                    stepsEl.innerText = '--';
+                    statusEl.innerText = 'Non configurato';
+                    return;
+                }
+
+                statusEl.innerText = 'Aggiorno...';
+                fetch(`https://api.jsonbin.io/v3/b/${appState.jsonbinId}/latest`, {
+                    headers: { 'X-Master-Key': appState.jsonbinKey, 'X-Bin-Meta': 'false' }
+                })
+                    .then(res => { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
+                    .then(data => {
+                        const steps = Number(data.steps);
+                        if (!data.date || isNaN(steps)) throw new Error('Formato dati non valido');
+                        stepsEl.innerText = steps.toLocaleString('it-IT');
+                        if (data.date === isoDate(new Date())) {
+                            statusEl.innerText = 'Aggiornato';
+                            statusEl.className = "text-[9px] uppercase tracking-widest text-[#d4af37]";
+                        } else {
+                            statusEl.innerText = 'Dato del ' + new Date(data.date + 'T00:00:00').toLocaleDateString('it-IT');
+                            statusEl.className = "text-[9px] uppercase tracking-widest text-[#666]";
+                        }
+                    })
+                    .catch(() => {
+                        stepsEl.innerText = '--';
+                        statusEl.innerText = 'Errore connessione';
+                        statusEl.className = "text-[9px] uppercase tracking-widest text-red-400";
+                    });
+            }
+
+            const BACKUP_KEYS = ['monthlyBudget', 'expenses', 'shifts', 'workouts', 'workoutCompleted', 'workLog', 'goals', 'weatherKey', 'geminiKey', 'city', 'customShiftDatabase', 'jsonbinId', 'jsonbinKey'];
 
             function exportBackup() {
                 const data = {};
