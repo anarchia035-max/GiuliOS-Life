@@ -218,6 +218,15 @@
                     <h3 class="text-[10px] font-semibold uppercase tracking-widest text-[#a1a1aa] mb-3">Registra Spesa</h3>
                     <div class="space-y-2.5">
                         <input type="text" id="input-expense-desc" placeholder="Descrizione" class="w-full px-3 py-2.5 text-sm rounded-xl bg-[#09090b] border border-[#27272a] focus:outline-none focus:border-[#d4af37] text-[#f4f4f5] transition-colors">
+                        <select id="input-expense-category" class="w-full px-3 py-2.5 text-sm rounded-xl bg-[#09090b] border border-[#27272a] focus:outline-none focus:border-[#d4af37] text-[#f4f4f5] transition-colors">
+                            <option value="cibo">Cibo</option>
+                            <option value="trasporti">Trasporti</option>
+                            <option value="casa">Casa</option>
+                            <option value="svago">Svago</option>
+                            <option value="salute">Salute</option>
+                            <option value="shopping">Shopping</option>
+                            <option value="altro">Altro</option>
+                        </select>
                         <div class="flex gap-2">
                             <input type="text" id="input-expense-amount" placeholder="Importo (€)" class="flex-1 px-3 py-2.5 text-sm rounded-xl bg-[#09090b] border border-[#27272a] focus:outline-none focus:border-[#d4af37] text-[#f4f4f5] transition-colors">
                             <button onclick="addExpense()" class="px-5 py-2.5 text-xs font-semibold tracking-wider uppercase rounded-xl bg-[#f4f4f5] text-[#09090b] font-bold transition-colors">
@@ -229,10 +238,10 @@
 
                 <div class="p-4 rounded-2xl bg-[#0e0e11] border border-[#1f1f23]">
                     <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-[10px] font-semibold uppercase tracking-widest text-[#a1a1aa]">Spese di Oggi</h3>
+                        <h3 class="text-[10px] font-semibold uppercase tracking-widest text-[#a1a1aa]">Storico Spese</h3>
                         <button onclick="clearExpenses()" class="text-[10px] tracking-wide text-[#666] hover:text-red-400 transition-colors uppercase">Azzera</button>
                     </div>
-                    <div id="expense-list" class="space-y-2 max-h-40 overflow-y-auto">
+                    <div id="expense-list" class="space-y-2 max-h-96 overflow-y-auto no-scrollbar">
                         <p class="text-xs text-[#666] text-center py-2">Nessuna spesa inserita.</p>
                     </div>
                 </div>
@@ -303,6 +312,15 @@
                         </div>
                     </div>
                     <p id="report-monthly-avg" class="text-[10px] text-[#a1a1aa] font-light mt-3">Media giornaliera: 0.00 €</p>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-[#0e0e11] border border-[#1f1f23]">
+                    <h3 class="text-[10px] font-semibold uppercase tracking-widest text-[#a1a1aa] mb-3">Spese per Categoria (Mese)</h3>
+                    <div class="flex items-center gap-4">
+                        <svg id="category-pie-chart" viewBox="0 0 100 100" class="w-28 h-28 shrink-0" role="img" aria-label="Grafico a torta spese per categoria"></svg>
+                        <div id="category-pie-legend" class="flex-1 space-y-1.5 text-[11px] min-w-0"></div>
+                    </div>
+                    <p id="category-pie-empty" class="hidden text-xs text-[#666] text-center py-2">Nessuna spesa questo mese.</p>
                 </div>
 
                 <div class="p-4 rounded-2xl bg-[#0e0e11] border border-[#1f1f23]">
@@ -403,6 +421,19 @@
                 }, wait);
             }
             const daysOfWeek = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
+
+            const EXPENSE_CATEGORIES = [
+                { key: 'cibo', label: 'Cibo', color: '#3987e5' },
+                { key: 'trasporti', label: 'Trasporti', color: '#199e70' },
+                { key: 'casa', label: 'Casa', color: '#c98500' },
+                { key: 'svago', label: 'Svago', color: '#008300' },
+                { key: 'salute', label: 'Salute', color: '#9085e9' },
+                { key: 'shopping', label: 'Shopping', color: '#e66767' },
+                { key: 'altro', label: 'Altro', color: '#d55181' }
+            ];
+            function categoryInfo(key) {
+                return EXPENSE_CATEGORIES.find(c => c.key === key) || EXPENSE_CATEGORIES[EXPENSE_CATEGORIES.length - 1];
+            }
 
             // Orari di default (Pool Bar)
             const defaultShiftDatabase = {
@@ -664,6 +695,7 @@
 
             function addExpense() {
                 const descInput = document.getElementById('input-expense-desc').value.trim();
+                const categoryInput = document.getElementById('input-expense-category').value;
                 const amountInput = document.getElementById('input-expense-amount').value.trim();
                 const parsedAmount = parseFloat(amountInput.replace(/,/g, '.'));
 
@@ -672,7 +704,7 @@
                     return;
                 }
 
-                appState.expenses.push({ id: Date.now(), description: descInput, amount: parsedAmount, date: isoDate(new Date()) });
+                appState.expenses.push({ id: Date.now(), description: descInput, category: categoryInput, amount: parsedAmount, date: isoDate(new Date()) });
                 localStorage.setItem('expenses', JSON.stringify(appState.expenses));
                 document.getElementById('input-expense-desc').value = '';
                 document.getElementById('input-expense-amount').value = '';
@@ -683,19 +715,40 @@
 
             function renderExpensesList() {
                 const listContainer = document.getElementById('expense-list');
-                const todayStr = isoDate(new Date());
-                const todayExpenses = appState.expenses.filter(exp => exp.date === todayStr);
 
-                if(todayExpenses.length === 0) {
-                    listContainer.innerHTML = '<p class="text-xs text-[#666] text-center py-2">Nessuna transazione.</p>';
+                if(appState.expenses.length === 0) {
+                    listContainer.innerHTML = '<p class="text-xs text-[#666] text-center py-2">Nessuna spesa inserita.</p>';
                     return;
                 }
+
+                const byDate = {};
+                appState.expenses.forEach(exp => { (byDate[exp.date] = byDate[exp.date] || []).push(exp); });
+                const sortedDates = Object.keys(byDate).sort((a, b) => b.localeCompare(a));
+
                 listContainer.innerHTML = '';
-                todayExpenses.forEach(exp => {
-                    const item = document.createElement('div');
-                    item.className = "flex justify-between items-center bg-[#09090b] p-3 rounded-xl border border-[#1f1f23] text-xs";
-                    item.innerHTML = `<span class="text-[#a1a1aa] font-light">${exp.description}</span><span class="font-medium text-[#f4f4f5]">${exp.amount.toFixed(2)} €</span>`;
-                    listContainer.appendChild(item);
+                sortedDates.forEach(dateStr => {
+                    const dayExpenses = byDate[dateStr];
+                    const dayTotal = dayExpenses.reduce((s, e) => s + e.amount, 0);
+                    const dLabel = new Date(dateStr + 'T00:00:00').toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
+
+                    const dayHeader = document.createElement('div');
+                    dayHeader.className = "flex justify-between items-center pt-3 first:pt-0";
+                    dayHeader.innerHTML = `<span class="text-[10px] uppercase tracking-widest text-[#d4af37] font-semibold capitalize">${dLabel}</span><span class="text-[10px] text-[#a1a1aa]">${dayTotal.toFixed(2)} €</span>`;
+                    listContainer.appendChild(dayHeader);
+
+                    dayExpenses.forEach(exp => {
+                        const cat = categoryInfo(exp.category);
+                        const item = document.createElement('div');
+                        item.className = "flex justify-between items-center bg-[#09090b] p-3 rounded-xl border border-[#1f1f23] text-xs mt-2";
+                        item.innerHTML = `
+                            <span class="flex items-center gap-2 text-[#e4e4e7] font-light min-w-0">
+                                <span class="w-2 h-2 rounded-full shrink-0" style="background:${cat.color}"></span>
+                                <span class="truncate">${exp.description}</span>
+                                <span class="text-[9px] text-[#666] uppercase tracking-wide shrink-0">${cat.label}</span>
+                            </span>
+                            <span class="font-medium text-[#f4f4f5] shrink-0 ml-2">${exp.amount.toFixed(2)} €</span>`;
+                        listContainer.appendChild(item);
+                    });
                 });
             }
 
@@ -889,6 +942,75 @@
                 document.getElementById('report-monthly-avg').innerText = "Media giornaliera: " + (monthlySpent / monthDaysElapsed).toFixed(2) + " €";
 
                 renderWorkLogArchive();
+                renderCategoryPieChart(monthPrefix);
+            }
+
+            function renderCategoryPieChart(monthPrefix) {
+                const svg = document.getElementById('category-pie-chart');
+                const legend = document.getElementById('category-pie-legend');
+                const emptyMsg = document.getElementById('category-pie-empty');
+                if (!svg || !legend || !emptyMsg) return;
+
+                const totals = {};
+                appState.expenses.filter(e => e.date.slice(0, 7) === monthPrefix).forEach(e => {
+                    const key = e.category || 'altro';
+                    totals[key] = (totals[key] || 0) + e.amount;
+                });
+                const grandTotal = Object.values(totals).reduce((s, v) => s + v, 0);
+
+                svg.innerHTML = '';
+                legend.innerHTML = '';
+
+                if (grandTotal <= 0) {
+                    svg.classList.add('hidden');
+                    emptyMsg.classList.remove('hidden');
+                    return;
+                }
+                svg.classList.remove('hidden');
+                emptyMsg.classList.add('hidden');
+
+                const cx = 50, cy = 50, r = 48;
+                const toRad = (deg) => (deg * Math.PI) / 180;
+                let cumulativeAngle = -90;
+
+                EXPENSE_CATEGORIES.filter(cat => totals[cat.key] > 0).forEach(cat => {
+                    const value = totals[cat.key];
+                    const fraction = value / grandTotal;
+                    const startAngle = cumulativeAngle;
+                    const endAngle = cumulativeAngle + fraction * 360;
+                    cumulativeAngle = endAngle;
+
+                    if (fraction >= 0.9999) {
+                        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                        circle.setAttribute('cx', cx);
+                        circle.setAttribute('cy', cy);
+                        circle.setAttribute('r', r);
+                        circle.setAttribute('fill', cat.color);
+                        svg.appendChild(circle);
+                    } else {
+                        const x1 = cx + r * Math.cos(toRad(startAngle));
+                        const y1 = cy + r * Math.sin(toRad(startAngle));
+                        const x2 = cx + r * Math.cos(toRad(endAngle));
+                        const y2 = cy + r * Math.sin(toRad(endAngle));
+                        const largeArc = (endAngle - startAngle) > 180 ? 1 : 0;
+                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        path.setAttribute('d', `M ${cx} ${cy} L ${x1.toFixed(3)} ${y1.toFixed(3)} A ${r} ${r} 0 ${largeArc} 1 ${x2.toFixed(3)} ${y2.toFixed(3)} Z`);
+                        path.setAttribute('fill', cat.color);
+                        path.setAttribute('stroke', '#0e0e11');
+                        path.setAttribute('stroke-width', '1.5');
+                        svg.appendChild(path);
+                    }
+
+                    const legendRow = document.createElement('div');
+                    legendRow.className = "flex items-center justify-between gap-2";
+                    legendRow.innerHTML = `
+                        <span class="flex items-center gap-1.5 text-[#e4e4e7] font-light min-w-0">
+                            <span class="w-2 h-2 rounded-full shrink-0" style="background:${cat.color}"></span>
+                            <span class="truncate">${cat.label}</span>
+                        </span>
+                        <span class="text-[#a1a1aa] shrink-0">${(fraction * 100).toFixed(0)}% · ${value.toFixed(2)} €</span>`;
+                    legend.appendChild(legendRow);
+                });
             }
 
             function renderWorkLogArchive() {
